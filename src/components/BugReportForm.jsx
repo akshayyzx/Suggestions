@@ -86,10 +86,10 @@ const BugReportForm = () => {
       {/* Type */}
       <select className="w-full h-10 px-3 border rounded" name="type" required>
         <option value="bug">🐞 Bug</option>
-        <option value="create">✨ New Feature</option>
-        <option value="improve">📈 Improvement</option>
-        <option value="remove">❌ Remove Feature</option>
-        <option value="reduce">📉 Reduce Complexity</option>
+        <option value="create">✨ Create</option>
+        <option value="improve">📈 Improve</option>
+        <option value="remove">❌ Remove </option>
+        <option value="reduce">📉 Reduce </option>
       </select>
 
       {/* Priority */}
