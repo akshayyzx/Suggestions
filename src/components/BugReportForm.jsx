@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { CloudUpload, CheckCircle, Loader2, XCircle } from "lucide-react";
+import logo from "../assets/logo.png";
 
 const BugReportForm = () => {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -7,13 +9,13 @@ const BugReportForm = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [description, setDescription] = useState("");
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     setUploadingImage(true);
-
     const data = new FormData();
     data.append("file", file);
     data.append("upload_preset", "suggestions-images");
@@ -34,87 +36,79 @@ const BugReportForm = () => {
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-
-    const url =
-      "https://script.google.com/macros/s/AKfycby2O6cnw4rdKyfC12wZS5zEdOCbDPZdEmPUahqy0SUj_OZigooes2Q87tcvUqAynQu8/exec";
-
-    const formData = new FormData();
-    formData.append("Name", event.target.elements.name.value);
-    formData.append("Title", event.target.elements.title.value);
-    formData.append("Description", event.target.elements.description.value);
-    formData.append("TestData", event.target.elements.testData.value);
-    formData.append("Date", currentDate);
-    formData.append("Type", event.target.elements.type.value);
-    formData.append("Priority", event.target.elements.priority.value);
-    if (imageUrl) {
-      formData.append("Screenshot", imageUrl);
-    }
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-      setSuccessMessage("Suggestion recorded. Thank you!");
-      event.target.reset();
-      setImageUrl("");
-    } catch (error) {
-      console.error("Error:", error);
-      setSuccessMessage("Failed to submit. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="max-w-lg mx-auto p-6 bg-gray-100 shadow-md rounded-lg my-10">
-      <h1 className="text-2xl font-bold mb-4 text-center">Bug Report Form</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input className="w-full p-2 border rounded" name="name" placeholder="Name" required />
-        <input className="w-full p-2 border rounded" name="title" placeholder="Title" required />
-        <textarea className="w-full p-2 border rounded" name="description" placeholder="Description" required />
+    <div className="h-screen flex items-center justify-center p-4 bg-gray-100">
+  <div className="max-w-md w-full p-4 bg-white shadow-lg rounded-md border border-gray-200 overflow-auto">
 
-        <input className="w-full p-2 border rounded" type="file" name="screenshot" accept="image/*" onChange={handleFileUpload} />
-        {uploadingImage && <p className="text-blue-600">Uploading...</p>}
-        {imageUrl && <p className="text-green-600">Image uploaded successfully!</p>}
-
-        <textarea className="w-full p-2 border rounded" name="testData" placeholder="Test Data" />
-        <input className="w-full p-2 border rounded bg-gray-200" type="date" name="date" value={currentDate} readOnly />
-
-        <select className="w-full p-2 border rounded" name="type" required>
-          <option value="bug">Bug</option>
-          <option value="create">Create</option>
-          <option value="improve">Improve</option>
-          <option value="remove">Remove</option>
-          <option value="reduce">Reduce</option>
-        </select>
-
-        {/* Priority Dropdown */}
-        <select className="w-full p-2 border rounded" name="priority" required>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-          <option value="critical">Critical</option>
-        </select>
-
-        <button
-          className={`w-full text-white p-2 rounded transition ${
-            loading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
-          }`}
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? "Submitting..." : "Submit"}
-        </button>
-
-        {successMessage && <p className="text-green-600 font-bold text-center">{successMessage}</p>}
-      </form>
+    {/* Logo */}
+    <div className="flex justify-center mb-3">
+      <img src={logo} alt="Nearz Logo" className="w-24 animate-fadeIn" />
     </div>
+
+    <h1 className="text-xl font-semibold mb-3 text-center text-gray-800">App Improvment Suggestions</h1>
+
+    <form className="space-y-3">
+      {/* Name Field */}
+      <input className="w-full h-10 p-2 border rounded" name="name" placeholder="Name" required />
+
+      {/* Title Field */}
+      <input className="w-full h-10 p-2 border rounded" name="title" placeholder="Title" required />
+
+      {/* Description */}
+      <textarea className="w-full h-18 p-2 border rounded" name="description" placeholder="Describe the issue..." maxLength={500} required />
+
+      {/* File Upload */}
+      <div className="border-dashed border-2 rounded-md p-3 text-center cursor-pointer hover:bg-gray-50">
+        <label className="cursor-pointer">
+          <CloudUpload className="mx-auto text-gray-400" />
+          <span className="block text-sm text-gray-500">Click to upload or drag & drop</span>
+          <input className="hidden" type="file" accept="image/*" onChange={handleFileUpload} />
+        </label>
+        {uploadingImage && <p className="text-blue-600 text-center">Uploading...</p>}
+      </div>
+
+      {/* Image Preview */}
+      {imageUrl && (
+        <div className="relative mt-2">
+          <img src={imageUrl} alt="Screenshot" className="w-full h-auto rounded-md shadow-sm" />
+          <button onClick={() => setImageUrl("")} className="absolute top-1 right-1 bg-white p-1 rounded-full shadow-md">
+            <XCircle className="text-red-500" />
+          </button>
+        </div>
+      )}
+
+      {/* Test Data */}
+      <textarea className="w-full h-16 p-2 border rounded" name="testData" placeholder="Test Data (optional)" />
+
+      {/* Date */}
+      <input className="w-full h-10 px-3 border rounded bg-gray-200" type="date" name="date" value={currentDate} readOnly />
+
+      {/* Type */}
+      <select className="w-full h-10 px-3 border rounded" name="type" required>
+        <option value="bug">🐞 Bug</option>
+        <option value="create">✨ New Feature</option>
+        <option value="improve">📈 Improvement</option>
+        <option value="remove">❌ Remove Feature</option>
+        <option value="reduce">📉 Reduce Complexity</option>
+      </select>
+
+      {/* Priority */}
+      <select className="w-full h-10 px-3 border rounded" name="priority" required>
+        <option value="low">🟢 Low</option>
+        <option value="medium">🟡 Medium</option>
+        <option value="high">🔴 High</option>
+        <option value="critical">🚨 Critical</option>
+      </select>
+
+      {/* Submit */}
+      <button className="w-full h-10 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center gap-2 font-semibold">
+        <CheckCircle />
+        Submit
+      </button>
+    </form>
+  </div>
+</div>
+
   );
 };
 
