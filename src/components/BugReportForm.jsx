@@ -12,7 +12,7 @@ const BugReportForm = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    setUploadingImage(true); 
+    setUploadingImage(true);
 
     const data = new FormData();
     data.append("file", file);
@@ -30,16 +30,16 @@ const BugReportForm = () => {
     } catch (error) {
       console.error("Image upload error:", error);
     } finally {
-      setUploadingImage(false); 
+      setUploadingImage(false);
     }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true); 
+    setLoading(true);
 
     const url =
-      "https://script.google.com/macros/s/AKfycbyUAIoFPfV1ETxyJjIS5TP-3LvPn-qVSZdxcylRbuZ3sdi70rwThnWpd4wfRfNs4cfL/exec";
+      "https://script.google.com/macros/s/AKfycby2O6cnw4rdKyfC12wZS5zEdOCbDPZdEmPUahqy0SUj_OZigooes2Q87tcvUqAynQu8/exec";
 
     const formData = new FormData();
     formData.append("Name", event.target.elements.name.value);
@@ -48,6 +48,7 @@ const BugReportForm = () => {
     formData.append("TestData", event.target.elements.testData.value);
     formData.append("Date", currentDate);
     formData.append("Type", event.target.elements.type.value);
+    formData.append("Priority", event.target.elements.priority.value);
     if (imageUrl) {
       formData.append("Screenshot", imageUrl);
     }
@@ -59,33 +60,32 @@ const BugReportForm = () => {
       });
 
       const data = await response.json();
-      console.log("Success:", data);
       setSuccessMessage("Suggestion recorded. Thank you!");
-      event.target.reset(); 
-      setImageUrl(""); 
+      event.target.reset();
+      setImageUrl("");
     } catch (error) {
       console.error("Error:", error);
       setSuccessMessage("Failed to submit. Please try again.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-gray-100 shadow-md rounded-lg">
+    <div className="max-w-lg mx-auto p-6 bg-gray-100 shadow-md rounded-lg my-10">
       <h1 className="text-2xl font-bold mb-4 text-center">Bug Report Form</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input className="w-full p-2 border rounded" name="name" placeholder="Name" required />
         <input className="w-full p-2 border rounded" name="title" placeholder="Title" required />
         <textarea className="w-full p-2 border rounded" name="description" placeholder="Description" required />
-        
-       
+
         <input className="w-full p-2 border rounded" type="file" name="screenshot" accept="image/*" onChange={handleFileUpload} />
         {uploadingImage && <p className="text-blue-600">Uploading...</p>}
         {imageUrl && <p className="text-green-600">Image uploaded successfully!</p>}
 
         <textarea className="w-full p-2 border rounded" name="testData" placeholder="Test Data" />
         <input className="w-full p-2 border rounded bg-gray-200" type="date" name="date" value={currentDate} readOnly />
+
         <select className="w-full p-2 border rounded" name="type" required>
           <option value="bug">Bug</option>
           <option value="create">Create</option>
@@ -94,18 +94,25 @@ const BugReportForm = () => {
           <option value="reduce">Reduce</option>
         </select>
 
-       
+        {/* Priority Dropdown */}
+        <select className="w-full p-2 border rounded" name="priority" required>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="critical">Critical</option>
+        </select>
+
         <button
           className={`w-full text-white p-2 rounded transition ${
             loading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
           }`}
           type="submit"
           disabled={loading}
-          >
+        >
           {loading ? "Submitting..." : "Submit"}
         </button>
-        {successMessage && <p className="text-green-600 font-bold text-center">{successMessage}</p>}
 
+        {successMessage && <p className="text-green-600 font-bold text-center">{successMessage}</p>}
       </form>
     </div>
   );
